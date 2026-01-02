@@ -3,79 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>سين جيم - تحدي الفريقين</title>
+    <title>سين جيم - التحدي الكبير</title>
     <style>
         :root { --gold: #f1c40f; --blue: #00d2ff; --dark: #0f0c29; --glass: rgba(255, 255, 255, 0.1); }
-        body { background: linear-gradient(135deg, #24243e, #0f0c29, #302b63); color: white; font-family: 'Segoe UI', Tahoma, sans-serif; margin: 0; min-height: 100vh; display: flex; flex-direction: column; align-items: center; }
+        body { background: linear-gradient(135deg, #24243e, #0f0c29); color: white; font-family: 'Segoe UI', Tahoma, sans-serif; margin: 0; min-height: 100vh; display: flex; flex-direction: column; align-items: center; }
         
-        /* الهيدر والمؤقت */
+        /* الهيدر */
         .header { width: 100%; padding: 15px; display: flex; justify-content: space-around; background: rgba(0,0,0,0.3); backdrop-filter: blur(10px); position: sticky; top: 0; z-index: 100; border-bottom: 2px solid var(--gold); }
-        .timer { font-size: 2rem; color: var(--gold); font-weight: bold; border: 2px solid var(--gold); padding: 5px 20px; border-radius: 50px; }
-        .score-board { display: flex; gap: 40px; }
-        .team-box { text-align: center; padding: 10px 20px; border-radius: 15px; background: var(--glass); min-width: 120px; }
-        .team1-color { border-bottom: 5px solid var(--blue); }
-        .team2-color { border-bottom: 5px solid #ff4757; }
+        .timer-box { font-size: 2.5rem; color: var(--gold); font-weight: bold; min-width: 100px; text-align: center; visibility: hidden; }
+        .team-box { text-align: center; padding: 10px 20px; border-radius: 15px; background: var(--glass); min-width: 150px; border: 1px solid rgba(255,255,255,0.1); }
+        .t1-border { border-bottom: 5px solid var(--blue); }
+        .t2-border { border-bottom: 5px solid #ff4757; }
 
         /* الشاشات */
         .screen { display: none; width: 90%; max-width: 1000px; padding: 20px; text-align: center; animation: fadeIn 0.5s; }
         .active { display: block; }
 
-        /* الفئات والأسئلة */
+        /* المدخلات */
+        input[type="text"] { padding: 12px; border-radius: 10px; border: none; width: 80%; max-width: 300px; margin: 10px; font-size: 1rem; }
+        
+        /* شبكة اللعبة */
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; margin-top: 20px; }
         .category-card { background: var(--glass); border: 1px solid var(--gold); padding: 20px; border-radius: 15px; cursor: pointer; transition: 0.3s; }
-        .category-card:hover { transform: scale(1.05); background: rgba(241, 196, 15, 0.2); }
         .category-card.selected { border-color: var(--blue); background: rgba(0, 210, 255, 0.2); }
-
+        
         .question-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; margin-top: 20px; }
         .q-cell { background: var(--glass); border: 1px solid white; padding: 15px 5px; border-radius: 8px; cursor: pointer; font-weight: bold; }
-        .q-cell:hover { background: var(--gold); color: black; }
         .q-cell.used { opacity: 0.3; cursor: not-allowed; background: #444; }
 
-        /* الوسائل المساعدة */
-        .powers { display: flex; gap: 10px; margin-top: 10px; justify-content: center; }
-        .power-btn { font-size: 0.8rem; padding: 5px 10px; border-radius: 5px; border: none; cursor: pointer; background: #555; color: white; }
-        .power-btn.active { background: #27ae60; }
-        .power-btn:disabled { text-decoration: line-through; opacity: 0.5; }
-
-        /* السؤال والإجابة */
-        .question-display { font-size: 2.5rem; margin: 50px 0; color: var(--gold); }
-        .answer-display { font-size: 2rem; color: #2ecc71; margin: 30px 0; display: none; }
-
-        .btn-large { padding: 15px 40px; font-size: 1.2rem; border-radius: 50px; border: none; cursor: pointer; margin: 10px; transition: 0.3s; }
+        .btn-large { padding: 15px 40px; font-size: 1.2rem; border-radius: 50px; border: none; cursor: pointer; margin: 10px; transition: 0.3s; font-weight: bold; }
         .btn-next { background: var(--blue); color: white; }
         .btn-correct { background: #2ecc71; color: white; }
-        .btn-wrong { background: #ff4757; color: white; }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        #timeout-msg { color: #ff4757; font-size: 1.5rem; font-weight: bold; display: none; margin: 20px 0; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <div class="team-box team1-color">
-            <div>فريق 1</div>
-            <div id="t1-score" style="font-size: 1.5rem; font-weight: bold;">0</div>
-            <div class="powers" id="t1-powers">
-                <button class="power-btn" onclick="usePower(1, 'pit')" id="t1-pit">الحفرة</button>
-                <button class="power-btn" onclick="usePower(1, 'call')" id="t1-call">صديق</button>
-            </div>
+        <div class="team-box t1-border">
+            <div id="display-name-1">الفريق 1</div>
+            <div id="t1-score" style="font-size: 1.8rem; font-weight: bold; color: var(--blue);">0</div>
+            <button class="power-btn" onclick="usePower(1, 'pit')" id="t1-pit">🕳️ الحفرة</button>
         </div>
-        <div class="timer" id="main-timer">00:30</div>
-        <div class="team-box team2-color">
-            <div>فريق 2</div>
-            <div id="t2-score" style="font-size: 1.5rem; font-weight: bold;">0</div>
-            <div class="powers" id="t2-powers">
-                <button class="power-btn" onclick="usePower(2, 'pit')" id="t2-pit">الحفرة</button>
-                <button class="power-btn" onclick="usePower(2, 'call')" id="t2-call">صديق</button>
-            </div>
+        <div class="timer-box" id="timer-display">40</div>
+        <div class="team-box t2-border">
+            <div id="display-name-2">الفريق 2</div>
+            <div id="t2-score" style="font-size: 1.8rem; font-weight: bold; color: #ff4757;">0</div>
+            <button class="power-btn" onclick="usePower(2, 'pit')" id="t2-pit">🕳️ الحفرة</button>
         </div>
     </div>
 
-    <div id="setup-screen" class="screen active">
-        <h1>اختيار الفئات (6 فئات مطلوبة)</h1>
-        <p id="selection-status">اللاعب 1: اختر 3 فئات</p>
+    <div id="name-screen" class="screen active">
+        <h1>مرحباً بك في سين جيم</h1>
+        <p>أدخل أسماء المتنافسين:</p>
+        <input type="text" id="name1" placeholder="اسم الشخص الأول">
+        <input type="text" id="name2" placeholder="اسم الشخص الثاني">
+        <br>
+        <button class="btn-large btn-next" onclick="saveNames()">متابعة</button>
+    </div>
+
+    <div id="setup-screen" class="screen">
+        <h1 id="selection-title">اللاعب 1: اختر 3 فئات</h1>
         <div class="grid" id="categories-grid"></div>
-        <button id="start-btn" class="btn-large btn-next" style="display: none;" onclick="startGame()">بدء التحدي</button>
+        <button id="start-btn" class="btn-large btn-next" style="display: none;" onclick="startGame()">بدء اللعب</button>
     </div>
 
     <div id="board-screen" class="screen">
@@ -83,90 +75,82 @@
     </div>
 
     <div id="question-screen" class="screen">
-        <div id="current-q-info" style="color: var(--gold);"></div>
-        <div class="question-display" id="q-text"></div>
+        <div id="current-q-info" style="color: var(--gold); font-size: 1.2rem;"></div>
+        <div id="timeout-msg">⏳ انتهى الوقت! يسمح للطرف الآخر بالإجابة</div>
+        <div id="q-text" style="font-size: 2.5rem; margin: 40px 0;"></div>
+        
         <button class="btn-large btn-next" id="show-ans-btn" onclick="showAnswer()">إظهار الإجابة</button>
-        <div class="answer-display" id="a-text"></div>
+        <div id="a-text" style="font-size: 2rem; color: #2ecc71; display: none; margin: 20px 0;"></div>
+        
         <div id="scoring-btns" style="display: none;">
-            <p>من أجاب بشكل صحيح؟</p>
-            <button class="btn-large btn-correct" onclick="awardPoints(1)">فريق 1 ✅</button>
-            <button class="btn-large btn-correct" onclick="awardPoints(2)">فريق 2 ✅</button>
-            <button class="btn-large btn-wrong" onclick="awardPoints(0)">لا أحد ❌</button>
+            <p>من الفائز بالنقاط؟</p>
+            <button class="btn-large btn-correct" id="score-btn-1" onclick="awardPoints(1)"></button>
+            <button class="btn-large btn-correct" id="score-btn-2" onclick="awardPoints(2)"></button>
+            <button class="btn-large" style="background:#555; color:white;" onclick="awardPoints(0)">لا أحد</button>
         </div>
     </div>
 
     <script>
-        // قاعدة البيانات (نموذج لـ 10 فئات، يمكنك التوسع لـ 100 بنفس النمط)
         const allCategories = [
-            { name: "تاريخ", questions: { 100:["أول أمير للكويت؟","صباح الأول"], 200:["سنة الاستقلال؟","1961"], 300:["سنة بناء السور الأول؟","1760"], 500:["تاريخ معركة الصريف؟","1901"] } },
-            { name: "رياضة", questions: { 100:["عدد لاعبي كرة القدم؟","11"], 200:["مستضيف كأس العالم 2022؟","قطر"], 300:["أكثر نادي حقق دوري الأبطال؟","ريال مدريد"], 500:["الفائز بأول كأس عالم 1930؟","الأوروغواي"] } },
-            { name: "مسلسلات", questions: { 100:["بطل مسلسل درب الزلق؟","عبدالحسين عبدالرضا"], 200:["اسم عائلة صراع العروش الرئيسية؟","ستارك"], 300:["عدد مواسم مسلسل فريندز؟","10"], 500:["أول مسلسل كويتي ملون؟","الإبريق المكسور"] } },
-            { name: "دول", questions: { 100:["عاصمة السعودية؟","الرياض"], 200:["أكبر دولة مساحة؟","روسيا"], 300:["دولة تقع في قارتين؟","تركيا"], 500:["عاصمة كازاخستان الحالية؟","أستانا"] } },
-            { name: "مغنون", questions: { 100:["لقب فنان العرب؟","محمد عبده"], 200:["صاحب أغنية يا طيب القلب؟","عبدالمجيد عبدالله"], 300:["اسم كوكب الشرق؟","أم كلثوم"], 500:["أول مطربة خليجية غنت في دار الأوبرا؟","نوال الكويتية"] } },
-            { name: "معلومات", questions: { 100:["أسرع كائن حي؟","الفهد"], 200:["معدن سائل؟","الزئبق"], 300:["عدد كواكب المجموعة الشمسية؟","8"], 500:["أصغر قارة في العالم؟","أستراليا"] } }
-            // أضف المزيد هنا حتى تصل لـ 100
+            { name: "تاريخ", questions: { 100:["من مؤسس الكويت؟","صباح الأول"], 200:["متى كان الاستقلال؟","1961"], 300:["متى تم بناء السور الثالث؟","1920"], 500:["تاريخ معركة الجهراء؟","1920"] } },
+            { name: "جغرافيا", questions: { 100:["عاصمة عمان؟","مسقط"], 200:["أكبر محيط؟","الهادي"], 300:["أعلى قمة جبل؟","إيفريست"], 500:["أعمق نقطة في البحار؟","خندق ماريانا"] } },
+            { name: "رياضة", questions: { 100:["لاعب يلقب بالبرغوث؟","ميسي"], 200:["بطل كأس العالم 2018؟","فرنسا"], 300:["عدد بطولات ريال مدريد في الأبطال؟","15"], 500:["أول فريق عربي فاز بمباراة في المونديال؟","تونس"] } },
+            { name: "أمثال", questions: { 100:["اللي ما يعرف الصقر..","يشويه"], 200:["طق عصي..","يصير دم"], 300:["الجار قبل..","الدار"], 500:["كأنك يا بو زيد..","ما غزيت"] } },
+            { name: "فضاء", questions: { 100:["أقرب كوكب للشمس؟","عطارد"], 200:["الكوكب الأحمر؟","المريخ"], 300:["أكبر كواكب المجموعة؟","المشتري"], 500:["أول رائد فضاء عربي؟","سلطان بن سلمان"] } },
+            { name: "اختراعات", questions: { 100:["مخترع المصباح؟","إديسون"], 200:["مخترع الهاتف؟","غراهام بيل"], 300:["مخترع الجاذبية؟","نيوتن"], 500:["مخترع الديناميت؟","نوبل"] } }
         ];
 
+        let p1Name = "", p2Name = "";
         let selectedCats = [];
         let scores = { 1: 0, 2: 0 };
-        let activePowers = { t1_pit: true, t1_call: true, t2_pit: true, t2_call: true };
+        let timerInterval;
+        let timeLeft = 40;
         let currentQ = null;
-        let currentPlayerSelection = 1;
+        let pitActive = false;
 
-        // إنشاء شبكة الاختيار
+        function saveNames() {
+            p1Name = document.getElementById('name1').value || "الشخص الأول";
+            p2Name = document.getElementById('name2').value || "الشخص الثاني";
+            document.getElementById('display-name-1').innerText = p1Name;
+            document.getElementById('display-name-2').innerText = p2Name;
+            document.getElementById('score-btn-1').innerText = p1Name;
+            document.getElementById('score-btn-2').innerText = p2Name;
+            
+            showScreen('setup-screen');
+            initSetup();
+        }
+
         function initSetup() {
             const grid = document.getElementById('categories-grid');
             allCategories.forEach((cat, index) => {
                 const card = document.createElement('div');
                 card.className = 'category-card';
                 card.innerText = cat.name;
-                card.onclick = () => selectCategory(index, card);
+                card.onclick = () => {
+                    if (selectedCats.includes(cat) || selectedCats.length >= 6) return;
+                    selectedCats.push(cat);
+                    card.classList.add('selected');
+                    if(selectedCats.length === 3) document.getElementById('selection-title').innerText = `${p2Name}: اختر 3 فئات`;
+                    if(selectedCats.length === 6) {
+                        document.getElementById('selection-title').innerText = "تم الاختيار!";
+                        document.getElementById('start-btn').style.display = 'inline-block';
+                    }
+                };
                 grid.appendChild(card);
             });
         }
 
-        function selectCategory(index, card) {
-            if (selectedCats.includes(allCategories[index])) return;
-            if (selectedCats.length >= 6) return;
-
-            selectedCats.push(allCategories[index]);
-            card.classList.add('selected');
-            
-            if (selectedCats.length === 3) {
-                document.getElementById('selection-status').innerText = "اللاعب 2: اختر 3 فئات";
-            }
-            if (selectedCats.length === 6) {
-                document.getElementById('selection-status').innerText = "تم اختيار جميع الفئات!";
-                document.getElementById('start-btn').style.display = 'inline-block';
-            }
-        }
-
-        function startGame() {
-            document.getElementById('setup-screen').classList.remove('active');
-            document.getElementById('board-screen').classList.add('active');
-            renderBoard();
-        }
+        function startGame() { showScreen('board-screen'); renderBoard(); }
 
         function renderBoard() {
             const board = document.getElementById('main-board');
             board.innerHTML = '';
-            
-            // الهيدر
             selectedCats.forEach(cat => {
-                const head = document.createElement('div');
-                head.style.fontWeight = 'bold';
-                head.style.color = 'var(--gold)';
-                head.innerText = cat.name;
-                board.appendChild(head);
+                const h = document.createElement('div'); h.innerText = cat.name; h.style.color = 'var(--gold)'; board.appendChild(h);
             });
-
-            // الأسئلة (100, 200, 300, 500) مرتين لكل فئة حسب طلبك
-            const points = [100, 100, 200, 200, 300, 300, 500, 500];
-            points.forEach(p => {
-                selectedCats.forEach((cat, cIdx) => {
-                    const cell = document.createElement('div');
-                    cell.className = 'q-cell';
-                    cell.innerText = p;
+            [100, 100, 200, 200, 300, 300, 500, 500].forEach(p => {
+                selectedCats.forEach(cat => {
+                    const cell = document.createElement('div'); cell.className = 'q-cell'; cell.innerText = p;
                     cell.onclick = () => openQuestion(cat, p, cell);
                     board.appendChild(cell);
                 });
@@ -176,64 +160,70 @@
         function openQuestion(cat, p, cell) {
             if (cell.classList.contains('used')) return;
             cell.classList.add('used');
-            currentQ = { cat: cat.name, points: p, q: cat.questions[p][0], a: cat.questions[p][1] };
+            currentQ = { points: p, a: cat.questions[p][1] };
             
-            document.getElementById('board-screen').classList.remove('active');
-            document.getElementById('question-screen').classList.add('active');
-            document.getElementById('q-text').innerText = currentQ.q;
+            document.getElementById('q-text').innerText = cat.questions[p][0];
             document.getElementById('current-q-info').innerText = `${cat.name} - ${p} نقطة`;
+            document.getElementById('timeout-msg').style.display = 'none';
             document.getElementById('a-text').style.display = 'none';
             document.getElementById('scoring-btns').style.display = 'none';
             document.getElementById('show-ans-btn').style.display = 'inline-block';
+            
+            showScreen('question-screen');
+            startTimer();
+        }
+
+        function startTimer() {
+            timeLeft = 40;
+            const display = document.getElementById('timer-display');
+            display.style.visibility = 'visible';
+            display.innerText = timeLeft;
+            display.style.color = 'var(--gold)';
+
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                display.innerText = timeLeft;
+                if (timeLeft <= 10) display.style.color = 'red';
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    document.getElementById('timeout-msg').style.display = 'block';
+                }
+            }, 1000);
         }
 
         function showAnswer() {
+            clearInterval(timerInterval);
+            document.getElementById('timer-display').style.visibility = 'hidden';
             document.getElementById('a-text').innerText = "الإجابة: " + currentQ.a;
             document.getElementById('a-text').style.display = 'block';
             document.getElementById('scoring-btns').style.display = 'block';
             document.getElementById('show-ans-btn').style.display = 'none';
         }
 
-        let pitActive = false;
-        function usePower(team, type) {
-            if (type === 'pit') {
-                pitActive = true;
-                alert(`الفريق ${team} استخدم الحفرة! إذا أجاب صحيحاً سيخصم النقاط من خصمه.`);
-            } else {
-                alert(`الفريق ${team} استخدم وسيلة اتصال بصديق!`);
-            }
-            document.getElementById(`t${team}-${type}`).disabled = true;
-        }
-
         function awardPoints(team) {
             if (team !== 0) {
                 if (pitActive) {
-                    const opponent = team === 1 ? 2 : 1;
-                    scores[opponent] -= currentQ.points;
+                    scores[team === 1 ? 2 : 1] -= currentQ.points;
                     pitActive = false;
                 }
                 scores[team] += currentQ.points;
-                updateScores();
+                document.getElementById(`t${team}-score`).innerText = scores[team];
+                document.getElementById(`t${team === 1 ? 2 : 1}-score`).innerText = scores[team === 1 ? 2 : 1];
             }
-            document.getElementById('question-screen').classList.remove('active');
-            document.getElementById('board-screen').classList.add('active');
+            showScreen('board-screen');
         }
 
-        function updateScores() {
-            document.getElementById('t1-score').innerText = scores[1];
-            document.getElementById('t2-score').innerText = scores[2];
+        function usePower(team, type) {
+            pitActive = true;
+            alert(`${team === 1 ? p1Name : p2Name} استخدم الحفرة!`);
+            document.getElementById(`t${team}-${type}`).disabled = true;
         }
 
-        // تشغيل المؤقت (للتصميم فقط)
-        setInterval(() => {
-            let t = document.getElementById('main-timer');
-            let parts = t.innerText.split(':');
-            let sec = parseInt(parts[1]);
-            if (sec > 0) sec--; else sec = 59;
-            t.innerText = "00:" + (sec < 10 ? "0" + sec : sec);
-        }, 1000);
-
-        initSetup();
+        function showScreen(id) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+        }
     </script>
 </body>
 </html>
