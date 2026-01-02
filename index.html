@@ -2,45 +2,53 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>سين جيم</title>
+    <title>SeenJeem</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
 </head>
 <body style="background:#0f0c29; color:white; font-family:sans-serif; text-align:center; padding-top:50px;">
-    <div id="auth">
-        <h1>سـيـن جـيـم</h1>
-        <p>جرب إنشاء حساب جديد الآن</p>
-        <input type="email" id="e" placeholder="الايميل" style="display:block; margin:10px auto; padding:12px; width:250px; border-radius:5px;">
-        <input type="password" id="p" placeholder="كلمة المرور" style="display:block; margin:10px auto; padding:12px; width:250px; border-radius:5px;">
-        <button onclick="signUp()" style="padding:10px 30px; background:#00d2ff; border:none; border-radius:20px; color:white; font-weight:bold; cursor:pointer;">إنشاء حساب</button>
-        <p id="error" style="color:red; font-size:12px; margin-top:10px;"></p>
+
+    <div id="auth-box">
+        <h1>سين جيم</h1>
+        <p>جرب الآن بعد تصحيح المفتاح</p>
+        <input type="email" id="email" placeholder="الايميل" style="padding:10px; width:250px; display:block; margin:10px auto;">
+        <input type="password" id="pass" placeholder="الباسوورد" style="padding:10px; width:250px; display:block; margin:10px auto;">
+        <button onclick="signUp()" style="padding:10px 20px; background:#00d2ff; border:none; color:white; cursor:pointer;">إنشاء حساب</button>
+        <div id="error-log" style="color:red; margin-top:10px; font-size:12px;"></div>
     </div>
-    <div id="game" style="display:none;">
-        <h1 style="color:gold;">مبروك! أنت الآن داخل اللعبة</h1>
-        <button onclick="firebase.auth().signOut()" style="background:red; color:white; border:none; padding:10px 20px; border-radius:10px;">خروج</button>
+
+    <div id="game-box" style="display:none;">
+        <h1 style="color:gold;">تم الدخول بنجاح!</h1>
+        <button onclick="firebase.auth().signOut()">تسجيل خروج</button>
     </div>
+
     <script>
-        const config = {
-            apiKey: "AIzaSyDA03DSASyfq1QmVhZWQKLV7gWKQLV7g",
+        // ضع مفتاحك الجديد هنا بدلاً من النجوم
+        const firebaseConfig = {
+            apiKey: ‏"AIzaSyDA03DSASyfq1QmVhZWQKLV7gN5rBhetUE",
             authDomain: "myseenjeem-cf223.firebaseapp.com",
             projectId: "myseenjeem-cf223",
             storageBucket: "myseenjeem-cf223.firebasestorage.app",
             messagingSenderId: "609632024034",
             appId: "1:609632024034:web:571952932f61821040f252"
         };
-        firebase.initializeApp(config);
-        const auth = firebase.auth();
+
+        firebase.initializeApp(firebaseConfig);
+
         function signUp() {
-            auth.createUserWithEmailAndPassword(document.getElementById('e').value, document.getElementById('p').value)
-                .catch(err => document.getElementById('error').innerText = err.message);
+            const e = document.getElementById('email').value;
+            const p = document.getElementById('pass').value;
+            firebase.auth().createUserWithEmailAndPassword(e, p)
+                .catch(err => { document.getElementById('error-log').innerText = err.message; });
         }
-        auth.onAuthStateChanged(user => {
+
+        firebase.auth().onAuthStateChanged(user => {
             if(user) {
-                document.getElementById('auth').style.display='none';
-                document.getElementById('game').style.display='block';
+                document.getElementById('auth-box').style.display = 'none';
+                document.getElementById('game-box').style.display = 'block';
             } else {
-                document.getElementById('auth').style.display='block';
-                document.getElementById('game').style.display='none';
+                document.getElementById('auth-box').style.display = 'block';
+                document.getElementById('game-box').style.display = 'none';
             }
         });
     </script>
