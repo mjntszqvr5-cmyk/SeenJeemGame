@@ -3,196 +3,178 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>سين جيم | النسخة الملكية</title>
+    <title>سين جيم | النسخة التفاعلية</title>
     <style>
-        :root { --gold: #f1c40f; --blue: #00d2ff; --dark: #0f0c29; --glass: rgba(255, 255, 255, 0.1); }
-        body { background: radial-gradient(circle, #24243e, #0f0c29); color: white; font-family: 'Segoe UI', sans-serif; margin: 0; min-height: 100vh; overflow-x: hidden; }
+        :root { --main-bg: #1e1e1e; --header-bg: #121212; --card-bg: #2d2d2d; --orange: #ff7644; --gold: #f1c40f; }
+        body { background-color: var(--main-bg); color: white; font-family: sans-serif; margin: 0; padding: 0; overflow-x: hidden; }
 
-        /* الإطار العلوي الجديد */
-        .top-bar { 
-            position: fixed; top: 0; left: 0; width: 100%; height: 60px; 
-            background: rgba(15, 12, 41, 0.9); backdrop-filter: blur(10px);
-            border-bottom: 2px solid var(--gold); display: flex; align-items: center; 
-            justify-content: space-between; padding: 0 20px; box-sizing: border-box; z-index: 4000;
-        }
+        /* الإطار العلوي */
+        .app-header { display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; background: var(--header-bg); border-bottom: 2px solid var(--orange); position: fixed; top: 0; width: 100%; z-index: 3000; box-sizing: border-box; }
+        .profile-area { display: flex; align-items: center; gap: 10px; }
+        .profile-avatar { background: var(--orange); width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
 
-        /* القائمة في اليمين */
-        .nav-right .dropbtn { background: none; border: none; color: var(--gold); font-size: 24px; cursor: pointer; }
-        .dropdown-content { display: none; position: absolute; right: 20px; top: 55px; background: #1a1a2e; min-width: 150px; border: 1px solid var(--gold); border-radius: 8px; }
-        .dropdown-content a { color: white; padding: 12px; text-decoration: none; display: block; border-bottom: 1px solid #333; font-size: 14px; }
-        .show { display: block !important; }
-
-        /* الملف الشخصي في اليسار */
-        .nav-left { display: flex; align-items: center; gap: 10px; color: var(--gold); font-size: 0.9rem; }
-        .profile-icon { width: 35px; height: 35px; background: var(--gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: black; font-weight: bold; }
-
-        /* الشاشات والمحتوى */
-        .content-area { margin-top: 80px; padding-bottom: 100px; }
-        .screen { display: none; width: 95%; max-width: 800px; text-align: center; margin: 0 auto; animation: fadeIn 0.4s; }
+        .screen { display: none; padding: 80px 15px 120px; text-align: center; min-height: 100vh; box-sizing: border-box; }
         .active { display: block !important; }
 
-        /* شبكة الفئات */
-        .section-title { color: var(--gold); font-size: 1.4rem; margin: 20px 0; display: block; }
-        .cat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 10px; }
-        .cat-card { 
-            aspect-ratio: 1/1; border-radius: 15px; position: relative; overflow: hidden; 
-            cursor: pointer; border: 2px solid rgba(241, 196, 15, 0.3); background-size: cover; background-position: center;
-            display: flex; align-items: center; justify-content: center; transition: 0.3s;
-        }
-        .cat-card::after { content: ""; position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.4); z-index: 1; }
-        .cat-card span { position: relative; z-index: 2; font-weight: bold; font-size: 1.2rem; text-shadow: 2px 2px 4px #000; }
-        .cat-card.selected { border-color: var(--blue); box-shadow: 0 0 15px var(--blue); }
+        /* لوحة الأسئلة المطورة */
+        .game-grid { display: grid; grid-template-columns: 1fr; gap: 20px; max-width: 600px; margin: auto; }
+        .category-row { display: flex; align-items: center; justify-content: center; gap: 10px; background: #222; padding: 10px; border-radius: 15px; }
+        .points-box { background: var(--card-bg); padding: 15px; border-radius: 10px; cursor: pointer; font-weight: bold; width: 60px; transition: 0.3s; }
+        .points-box:hover { background: var(--orange); }
+        .cat-thumb { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 2px solid var(--gold); }
+        .cat-name-mini { font-size: 0.7rem; color: var(--gold); margin-top: 5px; }
 
-        /* زر ابدأ اللعب الثابت في الأسفل */
-        .footer-action { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 3000; }
-        .btn-main { background: var(--gold); color: black; padding: 15px 50px; border-radius: 50px; border: none; font-weight: bold; font-size: 1.2rem; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
-        .btn-main:disabled { background: #555; color: #888; cursor: not-allowed; }
+        /* عداد الوقت */
+        #timer-box { font-size: 2rem; color: var(--orange); font-weight: bold; margin: 10px 0; }
+        .turn-msg { background: rgba(255,118,68,0.2); padding: 10px; border-radius: 10px; color: var(--orange); margin-bottom: 15px; font-weight: bold; }
 
-        /* شكل لوحة الأسئلة المطور */
-        .q-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; margin-top: 20px; }
-        .q-cell { 
-            background: linear-gradient(145deg, #1e1e3f, #11112b); border: 1px solid var(--gold); 
-            padding: 20px 2px; border-radius: 10px; cursor: pointer; color: var(--gold);
-            font-weight: bold; transition: 0.2s; box-shadow: inset 0 0 10px rgba(241, 196, 15, 0.1);
-        }
-        .q-cell:hover { transform: translateY(-3px); background: var(--gold); color: black; }
-
-        .game-info { display: none; justify-content: space-around; padding: 15px; background: rgba(0,0,0,0.4); border-radius: 15px; margin-bottom: 20px; border: 1px solid var(--glass); }
-
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        /* زر ابدأ اللعب */
+        .footer-action { position: fixed; bottom: 0; width: 100%; background: var(--header-bg); padding: 20px; border-top: 1px solid #333; z-index: 2500; display: none; text-align: center; }
+        .btn-play { background: var(--orange); color: white; border: none; padding: 15px; border-radius: 30px; width: 90%; max-width: 400px; font-size: 1.2rem; font-weight: bold; cursor: pointer; }
+        
+        .grid-cats { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
+        .cat-item { background: var(--card-bg); border-radius: 15px; overflow: hidden; border: 3px solid transparent; cursor: pointer; }
+        .cat-item img { width: 100%; height: 100px; object-fit: cover; }
+        .cat-item.selected { border-color: var(--gold); }
     </style>
 </head>
-<body onclick="hideDrop()">
+<body>
 
-    <div class="top-bar">
-        <div class="nav-right">
-            <button class="dropbtn" onclick="showDrop(event)">☰</button>
-            <div id="drop" class="dropdown-content">
-                <a href="#" onclick="location.reload()">إعادة تعيين اللعبة</a>
-            </div>
+    <header class="app-header">
+        <div style="font-size: 1.5rem;">☰</div>
+        <div class="profile-area">
+            <span id="header-player-name">لاعب 1</span>
+            <div class="profile-avatar">👤</div>
         </div>
-        <div style="font-weight: bold; color: var(--gold); letter-spacing: 2px;">سـيـن جـيـم</div>
-        <div class="nav-left">
-            <span>اللاعب الأول</span>
-            <div class="profile-icon">👤</div>
+    </header>
+
+    <div id="name-screen" class="screen active">
+        <h2 style="color:var(--gold)">أدخل أسماء المتنافسين</h2>
+        <input type="text" id="p1-input" placeholder="اسم اللاعب الأول" style="padding:12px; margin:10px; width:80%; border-radius:8px;"><br>
+        <input type="text" id="p2-input" placeholder="اسم اللاعب الثاني" style="padding:12px; margin:10px; width:80%; border-radius:8px;"><br>
+        <button onclick="saveNames()" style="background:var(--orange); border:none; color:white; padding:15px 40px; border-radius:30px; margin-top:20px;">متابعة</button>
+    </div>
+
+    <div id="setup-screen" class="screen">
+        <div class="turn-msg" id="selection-msg">اللاعب 1: اختر 3 فئات</div>
+        <div class="grid-cats" id="cats-container"></div>
+        <div class="footer-action" id="footer-btn-area">
+            <button class="btn-play" onclick="startTheGame()">ابدأ اللعب الآن</button>
         </div>
     </div>
 
-    <div class="content-area">
-        <div id="s1" class="screen active" style="margin-top: 15vh;">
-            <h1 style="font-size: 3.5rem; color: var(--gold);">مرحباً بك</h1>
-            <p>لعبة التحدي والذكاء</p>
-            <button class="btn-main" onclick="nav('s2')">دخول المسابقة</button>
-        </div>
+    <div id="board-screen" class="screen">
+        <div class="game-grid" id="main-board"></div>
+    </div>
 
-        <div id="s2" class="screen">
-            <h2>أسماء المتنافسين</h2>
-            <input type="text" id="p1" placeholder="اسم المتحدي الأول" style="padding:15px; width:80%; margin:10px; border-radius:10px; border:1px solid var(--gold); background: none; color: white;">
-            <input type="text" id="p2" placeholder="اسم المتحدي الثاني" style="padding:15px; width:80%; margin:10px; border-radius:10px; border:1px solid var(--gold); background: none; color: white;">
-            <br><br>
-            <button class="btn-main" onclick="save()">التالي</button>
-        </div>
-
-        <div id="s3" class="screen">
-            <h3 id="info-text" style="color: var(--gold);"></h3>
-            
-            <span class="section-title">فئات عامة</span>
-            <div class="cat-grid" id="g1"></div>
-
-            <span class="section-title">فئات إسلامية</span>
-            <div class="cat-grid" id="g2"></div>
-
-            <div class="footer-action">
-                <button id="start-btn" class="btn-main" disabled onclick="goBoard()">ابدأ اللعب الآن</button>
-            </div>
-        </div>
-
-        <div id="s4" class="screen">
-            <div class="game-info" id="g-info" style="display: flex;">
-                <div><span id="n1"></span><br><b id="sc1" style="color:var(--blue)">0</b></div>
-                <div id="tmr" style="font-size: 2.5rem; color: var(--gold);">40</div>
-                <div><span id="n2"></span><br><b id="sc2" style="color:#ff4757">0</b></div>
-            </div>
-            <div class="q-grid" id="board"></div>
-        </div>
-
-        <div id="s5" class="screen">
-            <div id="q-txt" style="font-size: 2rem; margin: 40px 0;"></div>
-            <button class="btn-main" onclick="showA()">كشف الإجابة</button>
-            <div id="a-txt" style="display:none; color:#2ecc71; font-size:1.8rem; margin:20px;"></div>
-            <div id="btns" style="display:none; margin-top:20px;">
-                <button class="btn-main" id="aw1" onclick="add(1)" style="padding:10px 30px; margin:5px;"></button>
-                <button class="btn-main" id="aw2" onclick="add(2)" style="padding:10px 30px; margin:5px; background:#ff4757;"></button>
-            </div>
-        </div>
+    <div id="q-screen" class="screen">
+        <div id="timer-box">40</div>
+        <h2 id="q-text" style="line-height:1.6;"></h2>
+        <div id="turn-alert" style="color:var(--gold); display:none; margin:15px; font-weight:bold;"></div>
+        <button onclick="revealAns()" style="background:var(--orange); border:none; color:white; padding:12px 30px; border-radius:10px; margin-top:20px;">إظهار الإجابة</button>
+        <h3 id="a-text" style="display:none; color:#2ecc71; margin-top:20px;"></h3>
+        <br><br>
+        <button onclick="closeQ()" style="background:#555; color:white; border:none; padding:10px 20px; border-radius:8px;">العودة للوحة</button>
     </div>
 
     <script>
-        const cats = [
-            { t: "1", n: "تاريخ", i: "https://images.unsplash.com/photo-1461360228754-6e81c478585b?w=400", q: {100:["مؤسس الكويت؟","صباح الأول"], 200:["سنة الاستقلال؟","1961"], 300:["بناء السور؟","1760"], 500:["معركة الصريف؟","1901"]} },
-            { t: "1", n: "عالم الشعر", i: "https://images.unsplash.com/photo-1544640808-32ca72ac7f67?w=400", q: {100:["شاعر الرسول؟","حسان بن ثابت"], 200:["المتنبي؟","أحمد بن الحسين"], 300:["نهج البردة؟","البوصيري"], 500:["الخيل والليل..","المتنبي"]} },
-            { t: "1", n: "لغة وادب", i: "https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=400", q: {100:["جمع سكر؟","سكر"], 200:["البيان والتبيين؟","الجاحظ"], 300:["عكس إجحاف؟","إنصاف"], 500:["أصغر بحور الشعر؟","المجتث"]} },
-            { t: "1", n: "معلومات عامه", i: "https://i.ibb.co/hRy3nCnZ/Untitled-design.png", q: {100:["أكبر محيط؟","الهادي"], 200:["الألب؟","أوروبا"], 300:["معدن سائل؟","الزئبق"], 500:["أطول خلية؟","العصبية"]} },
-            { t: "2", n: "السيرة", i: "https://images.unsplash.com/photo-1591604021695-0c69b7c05981?w=400", q: {100:["أين ولد النبي؟","مكة"], 200:["عدد الغزوات؟","27"], 300:["فتح مكة؟","8 هـ"], 500:["آخر غزوة؟","تبوك"]} },
-            { t: "2", n: "الأنبياء", i: "https://images.unsplash.com/photo-1584281723351-9d901645ed71?w=400", q: {100:["نبي الحوت؟","يونس"], 200:["كليم الله؟","موسى"], 300:["بنى السفينة؟","نوح"], 500:["نبي ملك؟","سليمان"]} },
-            { t: "2", n: "جزء عم", i: "https://images.unsplash.com/photo-1542810634-71277d95dcbb?w=400", q: {100:["أقصر سورة؟","الكوثر"], 200:["الهمزة؟","ويل لكل همزة"], 300:["المنجية؟","الملك"], 500:["سجدة جزء عم؟","الانشقاق"]} }
+        let p1 = "لاعب 1", p2 = "لاعب 2";
+        let selectedIDs = [];
+        let timer;
+        const categories = [
+            { id: 1, name: "إسلاميات", img: "https://images.unsplash.com/photo-1584281723351-9d901645ed71?w=200", q: {100:"أول مؤذن في الإسلام؟", 200:"عدد سور القرآن؟"}, a: {100:"بلال بن رباح", 200:"114 سورة"} },
+            { id: 2, name: "تاريخ", img: "https://images.unsplash.com/photo-1461360228754-6e81c478585b?w=200", q: {100:"سنة استقلال الكويت؟", 200:"باني الأهرامات؟"}, a: {100:"1961", 200:"الفراعنة"} },
+            { id: 3, name: "معلومات عامة", img: "https://i.ibb.co/hRy3nCnZ/Untitled-design.png", q: {100:"أكبر محيط؟", 200:"عاصمة فرنسا؟"}, a: {100:"الهادي", 200:"باريس"} },
+            { id: 4, name: "رياضة", img: "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=200", q: {100:"مدة مباراة القدم؟", 200:"بطل مونديال 2022؟"}, a: {100:"90 دقيقة", 200:"الأرجنتين"} },
+            { id: 5, name: "علوم", img: "https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=200", q: {100:"أقرب كوكب للشمس؟", 200:"مخترع المصباح؟"}, a: {100:"عطارد", 200:"أديسون"} },
+            { id: 6, name: "جغرافيا", img: "https://images.unsplash.com/photo-1521295121783-8a321d551ad2?w=200", q: {100:"أعلى قمة جبلية؟", 200:"أكبر دولة مساحة؟"}, a: {100:"إيفرست", 200:"روسيا"} }
         ];
 
-        let sel = [], nm1="", nm2="", s1=0, s2=0, t, cp=0, cq=null;
-
-        function nav(id) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById(id).classList.add('active'); window.scrollTo(0,0); }
-        function showDrop(e) { e.stopPropagation(); document.getElementById("drop").classList.toggle("show"); }
-        function hideDrop() { document.getElementById("drop").classList.remove("show"); }
-
-        function save() {
-            nm1 = document.getElementById('p1').value || "لاعب 1"; nm2 = document.getElementById('p2').value || "لاعب 2";
-            document.getElementById('info-text').innerText = nm1 + ": اختر 3 فئات";
-            nav('s3'); drawCats();
+        function saveNames() {
+            p1 = document.getElementById('p1-input').value || "لاعب 1";
+            p2 = document.getElementById('p2-input').value || "لاعب 2";
+            document.getElementById('name-screen').classList.remove('active');
+            document.getElementById('setup-screen').classList.add('active');
+            renderSelection();
         }
 
-        function drawCats() {
-            document.getElementById('g1').innerHTML = ''; document.getElementById('g2').innerHTML = '';
-            cats.forEach(c => {
-                const card = document.createElement('div');
-                card.className = 'cat-card' + (sel.includes(c) ? ' selected' : '');
-                card.style.backgroundImage = `url('${c.i}')`;
-                card.innerHTML = `<span>${c.n}</span>`;
-                card.onclick = () => {
-                    const i = sel.indexOf(c);
-                    if(i > -1) sel.splice(i, 1); else if(sel.length < 6) sel.push(c);
-                    document.getElementById('start-btn').disabled = (sel.length !== 6);
-                    drawCats();
-                };
-                document.getElementById(c.t === '1' ? 'g1' : 'g2').appendChild(card);
+        function renderSelection() {
+            const container = document.getElementById('cats-container');
+            container.innerHTML = '';
+            const msg = document.getElementById('selection-msg');
+            if(selectedIDs.length < 3) msg.innerText = `${p1}: اختر ${3 - selectedIDs.length} فئات`;
+            else if(selectedIDs.length < 6) msg.innerText = `${p2}: اختر ${6 - selectedIDs.length} فئات`;
+            else { msg.innerText = "اكتمل الاختيار!"; document.getElementById('footer-btn-area').style.display = 'block'; }
+
+            categories.forEach(cat => {
+                const isSelected = selectedIDs.includes(cat.id);
+                container.innerHTML += `<div class="cat-item ${isSelected ? 'selected' : ''}" onclick="selectCat(${cat.id})"><img src="${cat.img}"><div style="padding:5px;font-size:0.8rem;">${cat.name}</div></div>`;
             });
         }
 
-        function goBoard() {
-            document.getElementById('n1').innerText = nm1; document.getElementById('n2').innerText = nm2;
-            document.getElementById('aw1').innerText = nm1; document.getElementById('aw2').innerText = nm2;
-            nav('s4'); const b = document.getElementById('board'); b.innerHTML = '';
-            sel.forEach(c => { const h=document.createElement('div'); h.innerText=c.n; h.style.color='var(--gold)'; h.style.fontSize='0.7rem'; b.appendChild(h); });
-            [100, 200, 300, 500].forEach(p => {
-                sel.forEach(c => {
-                    const cell = document.createElement('div'); cell.className='q-cell'; cell.innerText=p;
-                    cell.onclick = () => { if(cell.style.opacity == '0.3') return; cell.style.opacity = '0.3'; showQ(c, p); };
-                    b.appendChild(cell);
-                });
+        function selectCat(id) {
+            const idx = selectedIDs.indexOf(id);
+            if (idx > -1) selectedIDs.splice(idx, 1);
+            else if (selectedIDs.length < 6) selectedIDs.push(id);
+            renderSelection();
+        }
+
+        function startTheGame() {
+            document.getElementById('setup-screen').classList.remove('active');
+            document.getElementById('board-screen').classList.add('active');
+            renderBoard();
+        }
+
+        function renderBoard() {
+            const board = document.getElementById('main-board');
+            const chosen = categories.filter(c => selectedIDs.includes(c.id));
+            board.innerHTML = '';
+            chosen.forEach(cat => {
+                board.innerHTML += `
+                    <div class="category-row">
+                        <div class="points-box" onclick="ask(${cat.id}, 100)">100</div>
+                        <div style="text-align:center">
+                            <img src="${cat.img}" class="cat-thumb">
+                            <div class="cat-name-mini">${cat.name}</div>
+                        </div>
+                        <div class="points-box" onclick="ask(${cat.id}, 200)">200</div>
+                    </div>`;
             });
         }
 
-        function showQ(c, p) {
-            cq=c; cp=p; nav('s5');
-            document.getElementById('q-txt').innerText = c.q[p][0];
-            document.getElementById('a-txt').style.display = 'none';
-            document.getElementById('btns').style.display = 'none';
-            let s = 40; const d = document.getElementById('tmr');
-            d.innerText = s; clearInterval(t);
-            t = setInterval(() => { s--; d.innerText=s; if(s<=0) clearInterval(t); }, 1000);
+        function ask(catId, pts) {
+            const cat = categories.find(c => c.id === catId);
+            document.getElementById('q-text').innerText = cat.q[pts];
+            document.getElementById('a-text').innerText = "الإجابة: " + cat.a[pts];
+            document.getElementById('a-text').style.display = 'none';
+            document.getElementById('turn-alert').style.display = 'none';
+            document.getElementById('board-screen').classList.remove('active');
+            document.getElementById('q-screen').classList.add('active');
+            startTimer();
         }
 
-        function showA() { clearInterval(t); document.getElementById('a-txt').innerText = "الإجابة: " + cq.q[cp][1]; document.getElementById('a-txt').style.display='block'; document.getElementById('btns').style.display='block'; }
-        function add(p) { if(p==1) s1+=cp; else s2+=cp; document.getElementById('sc1').innerText=s1; document.getElementById('sc2').innerText=s2; nav('s4'); }
+        function startTimer() {
+            let timeLeft = 40;
+            const display = document.getElementById('timer-box');
+            display.innerText = timeLeft;
+            clearInterval(timer);
+            timer = setInterval(() => {
+                timeLeft--;
+                display.innerText = timeLeft;
+                if(timeLeft <= 0) {
+                    clearInterval(timer);
+                    document.getElementById('turn-alert').innerText = `انتهى الوقت! الدور الآن للمنافس الثاني`;
+                    document.getElementById('turn-alert').style.display = 'block';
+                }
+            }, 1000);
+        }
+
+        function revealAns() { clearInterval(timer); document.getElementById('a-text').style.display = 'block'; }
+        function closeQ() { 
+            clearInterval(timer);
+            document.getElementById('q-screen').classList.remove('active');
+            document.getElementById('board-screen').classList.add('active');
+        }
     </script>
 </body>
 </html>
