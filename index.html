@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>سين جيم الكويتية</title>
+    <style>
+        :root { --primary: #2d3436; --accent: #6c5ce7; }
+        body { font-family: sans-serif; background: #dfe6e9; margin: 0; text-align: center; }
+        .screen { height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .hidden { display: none !important; }
+        .btn { padding: 15px 40px; background: var(--accent); color: white; border: none; border-radius: 50px; font-size: 20px; cursor: pointer; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 90%; margin-top: 20px; }
+        .card { background: white; padding: 30px 10px; border-radius: 15px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: flex; align-items: center; justify-content: center; }
+        .modal-content { background: white; width: 85%; padding: 25px; border-radius: 20px; }
+        .opt { display: block; width: 100%; padding: 15px; margin: 10px 0; border: 1px solid #ddd; border-radius: 10px; }
+    </style>
+</head>
+<body>
+    <div id="start-screen" class="screen">
+        <h1>💡 سين جِيـم</h1>
+        <button class="btn" onclick="startGame()">ابدأ اللعب</button>
+    </div>
+    <div id="game-screen" class="screen hidden">
+        <div class="grid" id="grid"></div>
+    </div>
+    <div id="modal" class="modal hidden">
+        <div class="modal-content">
+            <h2 id="q"></h2>
+            <div id="opts"></div>
+        </div>
+    </div>
+    <script>
+        const questions = [
+            { cat: "أمثال", q: "اللي ما يطول العنب..", opts: ["ياكله صبار", "حامض عنه يقول"], correct: 1 },
+            { cat: "تاريخ", q: "عملة الكويت القديمة؟", opts: ["الروبية", "الدينار"], correct: 0 },
+            { cat: "رياضة", q: "لقب منتخب الكويت؟", opts: ["الأزرق", "الأبيض"], correct: 0 }
+        ];
+        function startGame() {
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('game-screen').classList.remove('hidden');
+            const grid = document.getElementById('grid');
+            questions.forEach((item, i) => {
+                const d = document.createElement('div');
+                d.className = 'card'; d.innerText = item.cat;
+                d.onclick = () => {
+                    document.getElementById('q').innerText = item.q;
+                    const optsDiv = document.getElementById('opts');
+                    optsDiv.innerHTML = '';
+                    item.opts.forEach((o, idx) => {
+                        const b = document.createElement('button');
+                        b.className = 'opt'; b.innerText = o;
+                        b.onclick = () => { alert(idx === item.correct ? "صح!" : "خطأ!"); document.getElementById('modal').classList.add('hidden'); };
+                        optsDiv.appendChild(b);
+                    });
+                    document.getElementById('modal').classList.remove('hidden');
+                };
+                grid.appendChild(d);
+            });
+        }
+    </script>
+</body>
+</html>
