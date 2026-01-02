@@ -3,243 +3,141 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>سين جيم | النسخة الاحترافية</title>
+    <title>سين جيم | النسخة المطورة</title>
     <style>
-        :root { --gold: #f1c40f; --blue: #00d2ff; --dark: #0f0c29; --glass: rgba(255, 255, 255, 0.1); }
-        body { background: linear-gradient(135deg, #24243e, #0f0c29); color: white; font-family: 'Segoe UI', sans-serif; margin: 0; min-height: 100vh; }
+        :root { --main-bg: #1e1e1e; --card-bg: #2d2d2d; --orange: #ff7644; --gold: #f1c40f; }
+        body { background-color: var(--main-bg); color: white; font-family: sans-serif; margin: 0; padding: 0; }
 
-        /* القائمة المنسدلة المحسنة */
-        .dropdown { position: fixed; top: 20px; right: 20px; z-index: 3000; }
-        .dropbtn { background: var(--glass); border: 1px solid var(--gold); color: white; padding: 10px 15px; border-radius: 10px; cursor: pointer; backdrop-filter: blur(5px); }
-        .dropdown-content { display: none; position: absolute; right: 0; background: #1a1a2e; min-width: 160px; border-radius: 10px; border: 1px solid var(--gold); }
-        .dropdown-content a { color: white; padding: 12px 16px; text-decoration: none; display: block; border-bottom: 1px solid #333; }
+        /* الإطار العلوي الجديد */
+        .app-header { 
+            display: flex; justify-content: space-between; align-items: center; 
+            padding: 15px 20px; background: #121212; border-bottom: 2px solid var(--orange);
+            position: sticky; top: 0; z-index: 2000;
+        }
+        .profile-info { display: flex; align-items: center; gap: 10px; font-size: 0.9rem; }
+        .profile-icon { background: var(--orange); width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+
+        /* القائمة المنسدلة في اليمين */
+        .dropdown { position: relative; }
+        .dropbtn { background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer; }
+        .dropdown-content { 
+            display: none; position: absolute; right: 0; background: #222; 
+            min-width: 150px; border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.5); 
+        }
+        .dropdown-content a { color: white; padding: 12px; text-decoration: none; display: block; border-bottom: 1px solid #333; }
         .show { display: block !important; }
 
-        /* الأزرار والشاشات */
-        .screen { display: none; width: 95%; max-width: 800px; padding: 20px; text-align: center; margin: 20px auto; animation: fadeIn 0.3s; }
-        .active { display: block !important; }
-        .btn-action { padding: 10px 30px; border-radius: 50px; border: none; cursor: pointer; font-weight: bold; transition: 0.3s; margin: 10px; }
-        .btn-gold { background: var(--gold); color: black; }
-        .btn-back { background: rgba(255,255,255,0.2); color: white; font-size: 0.9rem; }
+        /* تنسيق الفئات */
+        .screen { display: none; padding: 20px 10px 100px; text-align: center; }
+        .active { display: block; }
+        .grid-container { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
+        .cat-card { background: var(--card-bg); border-radius: 12px; overflow: hidden; border: 2px solid transparent; transition: 0.3s; }
+        .cat-card img { width: 100%; height: 120px; object-fit: cover; }
+        .cat-title { background: var(--orange); padding: 5px; font-size: 0.8rem; font-weight: bold; }
+        .selected { border-color: var(--gold); transform: scale(0.95); }
 
-        /* شبكة الفئات 2 في كل صف */
-        .section-title { text-align: center; color: var(--gold); font-size: 1.8rem; margin: 30px 0; }
-        .cat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .cat-card { 
-            aspect-ratio: 1/1; border-radius: 15px; position: relative; overflow: hidden; 
-            cursor: pointer; border: 3px solid transparent; background-size: cover; background-position: center;
-            display: flex; align-items: center; justify-content: center; transition: 0.2s;
+        /* زر ابدأ اللعب الثابت في الأسفل */
+        .bottom-nav { 
+            position: fixed; bottom: 0; width: 100%; background: #121212; 
+            padding: 15px; text-align: center; border-top: 1px solid #333;
         }
-        .cat-card::after { content: ""; position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); z-index: 1; }
-        .cat-card span { position: relative; z-index: 2; font-weight: bold; font-size: 1.2rem; text-shadow: 2px 2px 4px #000; }
-        .cat-card.selected { border-color: var(--blue); transform: scale(0.95); }
-
-        /* منطقة ملخص الاختيارات */
-        .selection-summary { 
-            margin-top: 30px; padding: 20px; background: rgba(0,0,0,0.3); border-radius: 15px; 
-            display: flex; justify-content: space-around; border-top: 2px solid var(--gold);
+        .btn-start { 
+            background: var(--orange); color: white; border: none; 
+            padding: 12px 50px; border-radius: 25px; font-weight: bold; 
+            font-size: 1.1rem; cursor: pointer; width: 80%;
         }
-        .player-picks { width: 45%; }
-        .pick-tag { display: inline-block; background: var(--blue); color: black; padding: 5px 10px; border-radius: 5px; margin: 3px; font-size: 0.8rem; font-weight: bold; }
 
-        .header { width: 100%; padding: 15px; display: none; justify-content: space-around; background: rgba(0,0,0,0.5); border-bottom: 2px solid var(--gold); box-sizing: border-box; }
-        .question-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; margin-top: 20px; }
-        .q-cell { background: var(--glass); border: 1px solid white; padding: 15px 2px; border-radius: 8px; cursor: pointer; font-weight: bold; }
-
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .btn-intro { background: var(--gold); color: black; padding: 15px 40px; border-radius: 30px; border: none; font-size: 1.5rem; margin-top: 20vh; cursor: pointer; }
     </style>
 </head>
-<body onclick="closeDropdown(event)">
+<body>
 
-    <div class="dropdown">
-        <button class="dropbtn" onclick="toggleDropdown(event)">☰ القائمة</button>
-        <div id="myDropdown" class="dropdown-content">
-            <a href="#" onclick="location.reload()">إعادة تعيين</a>
-            <a href="#" onclick="alert('SeenJeem v3.0')">حول اللعبة</a>
+    <div class="app-header" id="main-header">
+        <div class="dropdown">
+            <button class="dropbtn" onclick="toggleMenu()">☰</button>
+            <div id="myDrop" class="dropdown-content">
+                <a href="#" onclick="location.reload()">الرئيسية</a>
+                <a href="#">الإعدادات</a>
+            </div>
+        </div>
+        <div class="profile-info">
+            <span>لاعب 1</span>
+            <div class="profile-icon">👤</div>
         </div>
     </div>
 
-    <div id="intro-screen" class="screen active" style="margin-top: 20vh;">
-        <h1 style="color: var(--gold); font-size: 4rem;">سـيـن جـيـم</h1>
-        <button class="btn-action btn-gold" style="font-size: 1.5rem;" onclick="showScreen('name-screen')">ابدأ اللعب</button>
+    <div id="intro" class="screen active">
+        <h1 style="color: var(--gold); font-size: 3rem;">سـيـن جـيـم</h1>
+        <button class="btn-intro" onclick="goSetup()">ابدأ</button>
     </div>
 
-    <div class="header" id="game-header">
-        <div id="t1-box"><b><span id="dn1"></span></b><br><span id="t1-score" style="color:var(--blue); font-size:1.5rem;">0</span></div>
-        <div id="timer-display" style="font-size: 2.5rem; color: var(--gold); font-weight: bold;">40</div>
-        <div id="t2-box"><b><span id="dn2"></span></b><br><span id="t2-score" style="color:#ff4757; font-size:1.5rem;">0</span></div>
-    </div>
-
-    <div id="name-screen" class="screen">
-        <button class="btn-action btn-back" onclick="showScreen('intro-screen')">⬅ رجوع</button>
-        <h2>تجهيز المتنافسين</h2>
-        <input type="text" id="name1" placeholder="اسم اللاعب الأول" style="padding:12px; margin:10px; width:80%; border-radius:8px;">
-        <input type="text" id="name2" placeholder="اسم اللاعب الثاني" style="padding:12px; margin:10px; width:80%; border-radius:8px;">
-        <br>
-        <button class="btn-action btn-gold" onclick="saveNames()">متابعة</button>
-    </div>
-
-    <div id="setup-screen" class="screen">
-        <button class="btn-action btn-back" onclick="showScreen('name-screen')">⬅ رجوع</button>
-        <h2 id="sel-title"></h2>
+    <div id="setup" class="screen">
+        <h2 style="color:var(--orange)">اختر 6 فئات للمسابقة</h2>
+        <div class="grid-container" id="cats-grid">
+            </div>
         
-        <div class="section-title">فئة ( عام )</div>
-        <div class="cat-grid" id="grid-general"></div>
-
-        <div class="section-title">فئة ( إسلاميات )</div>
-        <div class="cat-grid" id="grid-islamic"></div>
-
-        <div class="selection-summary">
-            <div class="player-picks" style="border-left: 1px solid #555;">
-                <div id="sum-name1" style="color: var(--blue); font-weight: bold;"></div>
-                <div id="sum-list1"></div>
-            </div>
-            <div class="player-picks">
-                <div id="sum-name2" style="color: #ff4757; font-weight: bold;"></div>
-                <div id="sum-list2"></div>
-            </div>
-        </div>
-
-        <button id="start-game-btn" class="btn-action btn-gold" style="display:none;" onclick="startGame()">دخول اللوحة</button>
-    </div>
-
-    <div id="board-screen" class="screen">
-        <button class="btn-action btn-back" onclick="backToSetup()">⬅ تغيير الفئات</button>
-        <div class="question-grid" id="main-board"></div>
-    </div>
-
-    <div id="question-screen" class="screen">
-        <div id="q-text" style="font-size: 2.2rem; margin: 30px 0;"></div>
-        <button class="btn-action btn-gold" onclick="showAnswer()">إظهار الإجابة</button>
-        <div id="a-text" style="font-size:1.8rem; color:#2ecc71; display:none; margin:20px 0;"></div>
-        <div id="scoring" style="display:none;">
-            <button class="btn-action" id="b1" onclick="award(1)" style="background:var(--blue);"></button>
-            <button class="btn-action" id="b2" onclick="award(2)" style="background:#ff4757;"></button>
+        <div class="bottom-nav">
+            <button class="btn-start" onclick="checkStart()">ابدأ اللعب الآن</button>
         </div>
     </div>
 
     <script>
-        // مصفوفة البيانات (نفس بياناتك السابقة)
         const categories = [
-            { type: "general", name: "تاريخ", img: "https://images.unsplash.com/photo-1461360228754-6e81c478585b?w=400", q: { 100:["من مؤسس الكويت؟","صباح الأول"], 200:["سنة الاستقلال؟","1961"], 300:["بناء السور الأول؟","1760"], 500:["معركة الصريف؟","1901"] } },
-            { type: "general", name: "عالم الشعر", img: "https://images.unsplash.com/photo-1544640808-32ca72ac7f67?w=400", q: { 100:["شاعر الرسول؟","حسان بن ثابت"], 200:["المتنبي؟","أحمد بن الحسين"], 300:["نهج البردة؟","البوصيري"], 500:["الخيل والليل..","المتنبي"] } },
-            { type: "general", name: "لغة وادب", img: "https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=400", q: { 100:["جمع سكر؟","سكر"], 200:["البيان والتبيين؟","الجاحظ"], 300:["عكس إجحاف؟","إنصاف"], 500:["أصغر بحور الشعر؟","المجتث"] } },
-            { type: "general", name: "معلومات عامه", img: "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=400", q: { 100:["أكبر محيط؟","الهادي"], 200:["الألب؟","أوروبا"], 300:["معدن سائل؟","الزئبق"], 500:["أطول خلية؟","العصبية"] } },
-            { type: "islamic", name: "السيرة النبوية", img: "https://images.unsplash.com/photo-1591604021695-0c69b7c05981?w=400", q: { 100:["أين ولد النبي ﷺ؟","مكة"], 200:["غزواته ﷺ؟","27"], 300:["فتح مكة؟","8 هـ"], 500:["آخر غزوة؟","تبوك"] } },
-            { type: "islamic", name: "قصص الانبياء", img: "https://images.unsplash.com/photo-1584281723351-9d901645ed71?w=400", q: { 100:["نبي ابتلعه الحوت؟","يونس"], 200:["كليم الله؟","موسى"], 300:["بنى السفينة؟","نوح"], 500:["نبي ملك عظيم؟","سليمان"] } },
-            { type: "islamic", name: "جزء عم", img: "https://images.unsplash.com/photo-1542810634-71277d95dcbb?w=400", q: { 100:["أقصر سورة؟","الكوثر"], 200:["الهمزة؟","ويل لكل همزة"], 300:["المنجية؟","الملك"], 500:["سجدة جزء عم؟","سورة الانشقاق"] } }
+            { id: 1, name: "معلومات عامة", img: "https://i.ibb.co/hRy3nCnZ/Untitled-design.png" },
+            { id: 2, name: "عالم الحيوان", img: "https://images.unsplash.com/photo-1557008075-0f230d016c15?w=200" },
+            { id: 3, name: "التاريخ", img: "https://images.unsplash.com/photo-1461360228754-6e81c478585b?w=200" },
+            { id: 4, name: "الرياضة", img: "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=200" },
+            { id: 5, name: "إسلاميات", img: "https://images.unsplash.com/photo-1584281723351-9d901645ed71?w=200" },
+            { id: 6, name: "العلوم", img: "https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=200" }
         ];
 
-        let selected = [], p1="", p2="", score1=0, score2=0, timer, currP=0;
+        let selected = [];
 
-        // وظائف القائمة المنسدلة
-        function toggleDropdown(e) { e.stopPropagation(); document.getElementById("myDropdown").classList.toggle("show"); }
-        function closeDropdown(e) { if (!e.target.matches('.dropbtn')) { document.getElementById("myDropdown").classList.remove("show"); } }
+        function toggleMenu() { document.getElementById("myDrop").classList.toggle("show"); }
 
-        function showScreen(id) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
-
-        function saveNames() {
-            p1 = document.getElementById('name1').value || "اللاعب 1";
-            p2 = document.getElementById('name2').value || "اللاعب 2";
-            document.getElementById('sum-name1').innerText = p1;
-            document.getElementById('sum-name2').innerText = p2;
-            document.getElementById('sel-title').innerText = `${p1}: اختر 3 فئات`;
-            showScreen('setup-screen');
-            initCats();
+        function goSetup() {
+            document.getElementById('intro').classList.remove('active');
+            document.getElementById('setup').classList.add('active');
+            loadCats();
         }
 
-        function initCats() {
-            const grids = ['grid-general', 'grid-islamic'];
-            grids.forEach(g => document.getElementById(g).innerHTML = '');
+        function loadCats() {
+            const grid = document.getElementById('cats-grid');
+            grid.innerHTML = '';
             categories.forEach(c => {
-                const card = document.createElement('div');
-                card.className = 'cat-card' + (selected.includes(c) ? ' selected' : '');
-                card.style.backgroundImage = `url('${c.img}')`;
-                card.innerHTML = `<span>${c.name}</span>`;
-                card.onclick = () => toggleSelect(c, card);
-                document.getElementById(c.type === 'general' ? 'grid-general' : 'grid-islamic').appendChild(card);
+                const isSel = selected.includes(c.id);
+                grid.innerHTML += `
+                    <div class="cat-card ${isSel ? 'selected' : ''}" onclick="selectCat(${c.id})">
+                        <img src="${c.img}">
+                        <div class="cat-title">${c.name}</div>
+                    </div>
+                `;
             });
-            updateSummary();
         }
 
-        function toggleSelect(c, card) {
-            const index = selected.indexOf(c);
-            if (index > -1) {
-                selected.splice(index, 1);
-                card.classList.remove('selected');
-            } else if (selected.length < 6) {
-                selected.push(c);
-                card.classList.add('selected');
+        function selectCat(id) {
+            const index = selected.indexOf(id);
+            if (index > -1) selected.splice(index, 1);
+            else if (selected.length < 6) selected.push(id);
+            loadCats();
+        }
+
+        function checkStart() {
+            if (selected.length < 6) {
+                alert("يرجى اختيار 6 فئات قبل البدء!");
+            } else {
+                alert("بدأت اللعبة! جاري الانتقال للوحة...");
+                // هنا يتم وضع الكود الخاص بالانتقال للوحة اللعب
             }
-            
-            // تحديث العناوين
-            if (selected.length < 3) document.getElementById('sel-title').innerText = `${p1}: اختر ${3 - selected.length}`;
-            else if (selected.length < 6) document.getElementById('sel-title').innerText = `${p2}: اختر ${6 - selected.length}`;
-            else document.getElementById('sel-title').innerText = "اكتمل الاختيار!";
-
-            document.getElementById('start-game-btn').style.display = (selected.length === 6) ? 'inline-block' : 'none';
-            updateSummary();
         }
 
-        function updateSummary() {
-            const list1 = document.getElementById('sum-list1');
-            const list2 = document.getElementById('sum-list2');
-            list1.innerHTML = ''; list2.innerHTML = '';
-            selected.forEach((c, i) => {
-                const tag = `<span class="pick-tag">${c.name}</span>`;
-                if (i < 3) list1.innerHTML += tag;
-                else list2.innerHTML += tag;
-            });
-        }
-
-        function startGame() {
-            document.getElementById('dn1').innerText = p1; document.getElementById('dn2').innerText = p2;
-            document.getElementById('b1').innerText = p1; document.getElementById('b2').innerText = p2;
-            document.getElementById('game-header').style.display = 'flex';
-            showScreen('board-screen');
-            renderBoard();
-        }
-
-        function renderBoard() {
-            const board = document.getElementById('main-board');
-            board.innerHTML = '';
-            selected.forEach(c => { const h=document.createElement('div'); h.innerText=c.name; h.style.color='var(--gold)'; h.style.fontSize='0.8rem'; board.appendChild(h); });
-            [100,100,200,200,300,300,500,500].forEach(p => {
-                selected.forEach(c => {
-                    const cell = document.createElement('div'); cell.className='q-cell'; cell.innerText=p;
-                    cell.onclick = () => { if(cell.style.opacity == '0.3') return; cell.style.opacity = '0.3'; showQ(c, p); };
-                    board.appendChild(cell);
-                });
-            });
-        }
-
-        function backToSetup() { document.getElementById('game-header').style.display = 'none'; showScreen('setup-screen'); }
-
-        function showQ(c, p) {
-            currP = p; showScreen('question-screen');
-            document.getElementById('q-text').innerText = c.q[p][0];
-            document.getElementById('a-text').style.display = 'none';
-            document.getElementById('scoring').style.display = 'none';
-            startTimer();
-        }
-
-        function startTimer() {
-            let s = 40; const d = document.getElementById('timer-display');
-            d.style.visibility='visible'; d.innerText=s;
-            clearInterval(timer);
-            timer = setInterval(() => { s--; d.innerText=s; if(s<=0) clearInterval(timer); }, 1000);
-        }
-
-        function showAnswer() {
-            clearInterval(timer); document.getElementById('timer-display').style.visibility='hidden';
-            document.getElementById('a-text').innerText = "الإجابة: " + categories.find(c => c.q[currP] && c.q[currP][0] === document.getElementById('q-text').innerText).q[currP][1];
-            document.getElementById('a-text').style.display='block'; document.getElementById('scoring').style.display='block';
-        }
-
-        function award(p) {
-            if(p==1) score1+=currP; else if(p==2) score2+=currP;
-            document.getElementById('t1-score').innerText=score1; document.getElementById('t2-score').innerText=score2;
-            showScreen('board-screen');
+        window.onclick = function(event) {
+            if (!event.target.matches('.dropbtn')) {
+                var drops = document.getElementsByClassName("dropdown-content");
+                for (var i = 0; i < drops.length; i++) {
+                    drops[i].classList.remove('show');
+                }
+            }
         }
     </script>
 </body>
