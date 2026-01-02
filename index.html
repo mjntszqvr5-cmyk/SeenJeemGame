@@ -3,81 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>سين جِيـم | دخول</title>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
-    <style>
-        :root { --bg: #0f0c29; --gold: #f1c40f; --accent: #00d2ff; }
-        body { background: linear-gradient(to bottom, #24243e, #0f0c29); color: white; font-family: sans-serif; margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
-        .box { background: rgba(255,255,255,0.1); padding: 30px; border-radius: 20px; backdrop-filter: blur(10px); width: 85%; max-width: 350px; text-align: center; border: 1px solid rgba(255,255,255,0.1); }
-        input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 10px; border: none; box-sizing: border-box; font-size: 16px; }
-        .btn { width: 100%; padding: 12px; background: var(--accent); color: white; border: none; border-radius: 25px; cursor: pointer; font-weight: bold; margin-top: 10px; }
-        .hidden { display: none !important; }
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 90vw; max-width: 600px; padding: 20px; }
-        .card { background: rgba(255,255,255,0.1); border: 1px solid var(--gold); padding: 40px 10px; border-radius: 15px; text-align: center; cursor: pointer; font-size: 1.2rem; }
-    </style>
+    <title>سين جيم | دخول</title>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
 </head>
-<body>
+<body style="background: #0f0c29; color: white; font-family: sans-serif; text-align: center; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0;">
 
-    <div id="auth-screen" class="box">
-        <h1 style="color: var(--gold); font-size: 40px; margin-bottom: 10px;">SeenJeem</h1>
-        <p style="margin-bottom: 20px;">ادخل بياناتك (6 خانات للباسوورد)</p>
-        <input type="email" id="email" placeholder="البريد الإلكتروني">
-        <input type="password" id="password" placeholder="كلمة المرور">
-        <button class="btn" onclick="login()">دخول</button>
-        <button class="btn" style="background:none; border: 1px solid var(--accent);" onclick="signup()">إنشاء حساب جديد</button>
-        <p id="error-msg" style="color: #ff4757; font-size: 13px; margin-top: 10px;"></p>
+    <div id="auth-box" style="background: rgba(255,255,255,0.1); padding: 30px; border-radius: 20px; width: 300px; border: 1px solid rgba(255,255,255,0.2);">
+        <h1 style="color: #f1c40f;">SeenJeem</h1>
+        <p>قم بإنشاء حسابك الأول</p>
+        <input type="email" id="email" placeholder="الإيميل" style="width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: none; box-sizing: border-box;">
+        <input type="password" id="pass" placeholder="كلمة المرور (6 أرقام)" style="width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: none; box-sizing: border-box;">
+        <button onclick="doSignup()" style="width: 100%; padding: 12px; background: #00d2ff; border: none; border-radius: 25px; color: white; font-weight: bold; cursor: pointer; margin-top: 10px;">إنشاء حساب جديد</button>
+        <button onclick="doLogin()" style="width: 100%; padding: 12px; background: none; border: 1px solid #00d2ff; border-radius: 25px; color: white; margin-top: 10px; cursor: pointer;">دخول مباشر</button>
+        <p id="msg" style="color: #ff4757; font-size: 13px; margin-top: 15px; font-weight: bold;"></p>
     </div>
 
-    <div id="game-screen" class="hidden">
-        <h1 style="text-align: center; color: var(--gold);">لوحة الفئات</h1>
-        <div class="grid">
-            <div class="card" onclick="alert('سؤال: عاصمة الكويت؟')">جغرافيا</div>
-            <div class="card" onclick="alert('سؤال: سنة الاستقلال؟')">تاريخ</div>
-        </div>
-        <button onclick="auth.signOut()" style="display:block; margin: 20px auto; color: #ff4757; background:none; border:none; cursor:pointer;">تسجيل خروج</button>
+    <div id="game-box" style="display: none;">
+        <h1 style="color: #f1c40f;">مرحباً بك في اللعبة!</h1>
+        <p>تم تسجيل دخولك بنجاح</p>
+        <button onclick="firebase.auth().signOut()" style="background: red; color: white; border: none; padding: 10px 20px; border-radius: 10px; cursor: pointer;">تسجيل خروج</button>
     </div>
 
     <script>
-        // بيانات مشروعك الحقيقية من Firebase
+        // بياناتك المستخرجة من الصورة
         const firebaseConfig = {
-            apiKey: "AIzaSyDA03DSASyfq1QmVhZWQKLV7gWKQLV7g", 
+            apiKey: "AIzaSyDA03DSASyfq1QmVhZWQKLV7gWKQLV7g",
             authDomain: "myseenjeem-cf223.firebaseapp.com",
             projectId: "myseenjeem-cf223",
             storageBucket: "myseenjeem-cf223.firebasestorage.app",
             messagingSenderId: "609632024034",
-            appId: "1:609632024034:web:571952932f61821040f252",
-            measurementId: "G-TCWM6Y8LQP"
+            appId: "1:609632024034:web:571952932f61821040f252"
         };
 
         firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
 
-        function login() {
-            const e = document.getElementById('email').value;
-            const p = document.getElementById('password').value;
-            auth.signInWithEmailAndPassword(e, p).catch(err => {
-                document.getElementById('error-msg').innerText = "خطأ: تأكد من الإيميل والباسوورد";
-            });
+        function doSignup() {
+            const email = document.getElementById('email').value;
+            const pass = document.getElementById('pass').value;
+            const msg = document.getElementById('msg');
+            
+            msg.innerText = "جاري الاتصال...";
+            
+            firebase.auth().createUserWithEmailAndPassword(email, pass)
+                .then(() => { alert("تم إنشاء الحساب بنجاح!"); })
+                .catch((error) => { msg.innerText = "فشل: " + error.message; });
         }
 
-        function signup() {
-            const e = document.getElementById('email').value;
-            const p = document.getElementById('password').value;
-            auth.createUserWithEmailAndPassword(e, p).then(() => {
-                alert("تم إنشاء الحساب! سجل دخولك الآن.");
-            }).catch(err => {
-                document.getElementById('error-msg').innerText = "خطأ: الإيميل مستخدم أو باسوورد قصير";
-            });
+        function doLogin() {
+            const email = document.getElementById('email').value;
+            const pass = document.getElementById('pass').value;
+            firebase.auth().signInWithEmailAndPassword(email, pass)
+                .catch((error) => { document.getElementById('msg').innerText = "خطأ في البيانات"; });
         }
 
-        auth.onAuthStateChanged(user => {
+        firebase.auth().onAuthStateChanged((user) => {
             if (user) {
-                document.getElementById('auth-screen').classList.add('hidden');
-                document.getElementById('game-screen').classList.remove('hidden');
+                document.getElementById('auth-box').style.display = 'none';
+                document.getElementById('game-box').style.display = 'block';
             } else {
-                document.getElementById('auth-screen').classList.remove('hidden');
-                document.getElementById('game-screen').classList.add('hidden');
+                document.getElementById('auth-box').style.display = 'block';
+                document.getElementById('game-box').style.display = 'none';
             }
         });
     </script>
